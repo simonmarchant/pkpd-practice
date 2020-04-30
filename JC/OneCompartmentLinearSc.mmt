@@ -1,0 +1,46 @@
+[[model]]
+name: One Comparment Model 
+author: Ken Wang
+
+# Initial values:
+doseCompartment.drug = 0
+centralCompartment.drug = 0
+
+
+
+[environment]
+t = 0 bind time
+    
+
+[dose]
+doseAmount = 1  # Will be set later by Python script 
+DoseBinary = 0  # 0 when not dosing, 1 when dosing
+    bind pace   # set DoseBinary using the protocol
+doseApplication = DoseBinary * doseAmount
+
+[doseCompartment]
+Ka = 1 [1/h]
+    desc: "absorption" rate
+dot(drug) = -Ka * drug + dose.doseApplication
+    in [ng]
+
+
+[centralCompartment]
+CL = 1 [mL/h]
+    desc: Clearance/elimination rate from central compartment 
+
+
+Vc = 1 [mL]
+    desc: Volume of the central compartment 
+
+
+dot(drug) = doseCompartment.Ka*doseCompartment.drug- CL/Vc*drug
+    desc: Amount of drug in central compartment unit in ng 
+
+
+drugConcentration = drug / Vc
+    desc: Concentration of drug in the central compartment unit ng/mL
+
+[[protocol]]
+# Level Start   Length  Period  Multiplier
+1       0       0.001   0       0
